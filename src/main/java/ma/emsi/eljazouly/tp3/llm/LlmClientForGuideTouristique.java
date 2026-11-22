@@ -64,15 +64,16 @@ public class LlmClientForGuideTouristique {
      * Demande au LLM des informations touristiques sur un lieu.
      *
      * @param lieu nom d'une ville ou d'un pays.
+     * @param nb   nombre d'endroits a visiter.
      * @return la réponse JSON du LLM.
      * @throws LlmException si l'échange avec le LLM échoue.
      */
-    public String getInfos(String lieu) {
+    public String getInfos(String lieu, int nb) {
         if (guideTouristique == null) {
             throw new LlmException("La variable d'environnement GEMINI_KEY n'est pas définie.");
         }
         try {
-            return guideTouristique.chat(lieu);
+            return guideTouristique.chat(lieu, nb);
         } catch (RuntimeException e) {
             throw new LlmException("Erreur pendant l'échange avec le LLM : " + e.getMessage(), e);
         }
