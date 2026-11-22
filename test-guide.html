@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Test du guide touristique</title>
+    <!-- Page locale (ouverte avec file://) qui appelle l'API REST du TP 3.
+         Elle fonctionne grace a l'en-tete Access-Control-Allow-Origin: * de la reponse (CORS). -->
+    <style>
+        body { font-family: sans-serif; max-width: 640px; margin: 2em auto; padding: 0 16px; }
+        label { display: block; margin-top: .8em; }
+        input { padding: .3em; }
+        button { margin-top: 1em; padding: .4em 1em; }
+        pre { background: #f4f4f4; padding: 1em; white-space: pre-wrap; word-break: break-word; }
+        .erreur { color: #b00020; }
+    </style>
+</head>
+<body>
+<h1>Guide touristique</h1>
+<form id="form">
+    <label>Ville ou pays : <input id="lieu" value="Casablanca" required></label>
+    <label>Nombre d'endroits (1 a 10) : <input id="nb" type="number" min="1" max="10" value="2"></label>
+    <button type="submit">Envoyer</button>
+</form>
+<p id="url"></p>
+<pre id="resultat"></pre>
+<script>
+    const API = "http://localhost:8080/tp3-eljazouly-25-26-1.0-SNAPSHOT/api/guide/lieu/";
+    const resultat = document.getElementById("resultat");
+    document.getElementById("form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const lieu = document.getElementById("lieu").value.trim();
+        const nb = document.getElementById("nb").value;
+        const url = API + encodeURIComponent(lieu) + "?nb=" + encodeURIComponent(nb);
+        document.getElementById("url").textContent = "GET " + url;
+        resultat.className = "";
+        resultat.textContent = "Attente de la reponse du LLM...";
+        try {
+            const reponse = await fetch(url);
+            const json = await reponse.json();
+            if (!reponse.ok) {
+                resultat.className = "erreur";
+            }
+            resultat.textContent = "HTTP " + reponse.status + "\n" + JSON.stringify(json, null, 2);
+        } catch (e) {
+            resultat.className = "erreur";
+            resultat.textContent = "Erreur : " + e.message;
+        }
+    });
+</script>
+</body>
+</html>
